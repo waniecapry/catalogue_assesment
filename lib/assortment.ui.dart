@@ -81,6 +81,8 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     final List<AssortmentProduct> _products = [];
     int _offset = 0;
     bool _hasMoreProducts = true;
+    bool _isLoading = false;
+    Object? _loadError;
 
     bool get _isBottom 
     {
@@ -138,6 +140,44 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
                                 }, childCount: _products.length )
                             )
                         ),
+                        if( _isLoading ) const SliverToBoxAdapter
+                        (
+                            child: Padding
+                            (
+                                padding: AssortmentUi.kPadding,
+                                child: Center( child: CircularProgressIndicator() )
+                            )
+                        ),
+                        if( _loadError != null ) SliverToBoxAdapter
+                        (
+                            child: Padding
+                            (
+                                padding: AssortmentUi.kPadding,
+                                child: Column
+                                (
+                                    children: 
+                                    [
+                                        const Text( "Unable to load products." ),
+                                        TextButton
+                                        (
+                                            onPressed: _loadProducts,
+                                            child: const Text( "Try again" )
+                                        )
+                                    ]
+                                )
+                            )
+                        ),
+                        if( !_isLoading && _loadError == null && _products.isEmpty ) SliverToBoxAdapter
+                        (
+                            child: Padding
+                            (
+                                padding: AssortmentUi.kPadding,
+                                child: Center
+                                (
+                                    child: Text( "No products found" )
+                                )
+                            )
+                        )
                     ]
                 )
             )
@@ -151,14 +191,32 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
 
             _offset = 0;
             _hasMoreProducts = true;
+            _isLoading = false;
+            _loadError = null;
         });
         await _loadProducts();
     }
     Future<void> _loadProducts() async 
     {
+        if( _isLoading || !_hasMoreProducts ) 
+        {
+            return;
+        }
+
+        setState( () 
+        {
+            _isLoading = true;
+            _loadError = null;
+        });
+
         try 
         {
             final products = await Assortment.getProductList( _offset, _limit );
+
+            if( !mounted ) // Who knows user has back to the previous page?
+            {
+                return;
+            }
 
             setState( () 
             {
@@ -166,16 +224,26 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
 
                 _offset += products.length;
                 _hasMoreProducts = products.length == _limit;
+                _isLoading = false;
             });
         } 
         catch( error ) 
-        {
-            log( "$error" );
+        {                                                                               log( "$error" );
+            if( !mounted ) // Who knows user has back to the previous page?
+            {
+                return;
+            }
+
+            setState( () 
+            {
+                _loadError = error;
+                _isLoading = false;
+            });
         }
     }
     void _onScroll() 
     {
-        if( _isBottom && _hasMoreProducts ) 
+        if( _isBottom && _hasMoreProducts && !_isLoading ) 
         {
             _loadProducts();
         }

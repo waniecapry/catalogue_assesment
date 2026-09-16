@@ -72,6 +72,19 @@ class Assortment // This class represents the app. Assortment stands for Product
         return products;
     }
 }
+class AssortmentDimension 
+{
+    final double width;
+    final double height;
+    final double depth;
+
+    AssortmentDimension
+    ({
+        required this.width,
+        required this.height,
+        required this.depth
+    });
+}
 class AssortmentProduct // Many of the properties can be turned to enum/classes. It is easier to maintain, read and manage strongly typed data.
 {
     final String id;
@@ -86,7 +99,7 @@ class AssortmentProduct // Many of the properties can be turned to enum/classes.
     final String brand; // If given the list of brands, I will make Brand class and use it here instead of String.
     final String sku;
     final double weight;
-    final Map<String, dynamic> dimension; // dimension class
+    final AssortmentDimension dimension; // dimension class
     final String warrantyInfo;
     final String shippingInfo;
     final String availabilityStatus; // If possible, I will make an enum for this instead of String.

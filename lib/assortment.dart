@@ -45,3 +45,57 @@ class Assortment // This class represents the app. Assortment stands for Product
         return products;
     }
 }
+class AssortmentProduct // Many of the properties can be turned to enum/classes. It is easier to maintain, read and manage strongly typed data.
+{
+    final String id;
+    final String title;
+    final String description;
+    final String category; // enum
+    final double price;
+    final double discountPercentage;
+    final double rating;
+    final int stock;
+    final List<String> tags;
+    final String brand; // If given the list of brands, I will make Brand class and use it here instead of String.
+    final String sku;
+    final double weight;
+    final Map<String, dynamic> dimension; // dimension class
+    final String warrantyInfo;
+    final String shippingInfo;
+    final String availabilityStatus; // If possible, I will make an enum for this instead of String.
+    final List<Map<String, dynamic>> reviews = []; // review class
+    final Map<String, dynamic> meta; // class
+    final List<String> images;
+    final String thumbnail;
+
+    AssortmentProduct
+    ({
+        required this.id,
+        required this.title,
+        required this.description,
+        required this.category,
+        required this.price,
+        required this.discountPercentage,
+        required this.rating,
+        required this.stock,
+        required this.tags,
+        required this.brand,
+        required this.sku,
+        required this.weight,
+        required this.dimension,
+        required this.warrantyInfo,
+        required this.shippingInfo,
+        required this.availabilityStatus,
+        required this.meta,
+        required this.images,
+        required this.thumbnail
+    });
+    double get discountedPrice 
+    {
+        return price * (1 - discountPercentage / 100);
+    }
+    Future<AssortmentProduct> getDetails() async // https://dummyjson.com/products/{id} returns the same data as the list, so I will just return this for now. If the API changes, I will update this method accordingly.
+    {
+        return this;
+    }
+}

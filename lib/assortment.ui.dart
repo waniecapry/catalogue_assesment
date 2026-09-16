@@ -45,24 +45,99 @@ class _AssortmentUiMainScreenState extends State<AssortmentUiMainScreen>
 {
     @override Widget build( BuildContext context )
     {
+        final colorScheme = Theme.of( context ).colorScheme;
+
         return Scaffold
-        ( 
+        (
+            appBar: AppBar
+            (
+                title: Row
+                (
+                    mainAxisSize: MainAxisSize.min,
+                    children:
+                    [
+                        Icon( Icons.shopping_bag_outlined, color: colorScheme.primary ),
+                        AssortmentUi.kHorizontalSpacingExtraSmall,
+                        const Text( Assortment.appName )
+                    ]
+                )
+            ),
             body: SafeArea
             (
-                child: GestureDetector
+                child: Center
                 (
-                    child: Text( "Welcome" ),
-                    onTap: () async
-                    {
-                        Navigator.push
+                    child: SingleChildScrollView
+                    (
+                        padding: AssortmentUi.kPadding,
+                        child: ConstrainedBox
                         (
-                            context,
-                            MaterialPageRoute
+                            constraints: const BoxConstraints( maxWidth: 560 ),
+                            child: Column
                             (
-                                builder: (context)=> const _AssortmentUiProductListScreen()
+                                mainAxisSize: MainAxisSize.min,
+                                children:
+                                [
+                                    Container
+                                    (
+                                        padding: const EdgeInsets.all( 28 ),
+                                        decoration: BoxDecoration
+                                        (
+                                            color: colorScheme.primaryContainer,
+                                            shape: BoxShape.circle
+                                        ),
+                                        child: Icon
+                                        (
+                                            Icons.storefront_rounded,
+                                            size: 72,
+                                            color: colorScheme.onPrimaryContainer
+                                        )
+                                    ),
+                                    AssortmentUi.kVerticalSpacingExtraLarge,
+                                    Text
+                                    (
+                                        "Find your next favourite product",
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of( context ).textTheme.displaySmall?.copyWith
+                                        (
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.1
+                                        )
+                                    ),
+                                    AssortmentUi.kVerticalSpacingMedium,
+                                    Text
+                                    (
+                                        Assortment.appDescription,
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of( context ).textTheme.bodyLarge?.copyWith
+                                        (
+                                            color: colorScheme.onSurfaceVariant
+                                        )
+                                    ),
+                                    AssortmentUi.kVerticalSpacingExtraLarge,
+                                    FilledButton.icon
+                                    (
+                                        style: FilledButton.styleFrom
+                                        (
+                                            minimumSize: const Size.fromHeight( 52 )
+                                        ),
+                                        onPressed: ()
+                                        {
+                                            Navigator.push
+                                            (
+                                                context,
+                                                MaterialPageRoute
+                                                (
+                                                    builder: (context)=> const _AssortmentUiProductListScreen()
+                                                )
+                                            );
+                                        },
+                                        icon: const Icon( Icons.arrow_forward_rounded ),
+                                        label: const Text( "Explore products" )
+                                    )
+                                ]
                             )
-                        );
-                    }
+                        )
+                    )
                 )
             )
         );

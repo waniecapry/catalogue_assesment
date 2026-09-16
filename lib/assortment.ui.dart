@@ -7,7 +7,22 @@ import "assortment.dart";
 class AssortmentUi // Represents the app in handling UI logic. Anything common for accross the apps should be put here.
 {
     static const kPadding = EdgeInsets.all( 16 );
-
+    static const kCollapsedPadding = EdgeInsets.all( 1 );
+    static const kVerticalSpacingExtraSmall = SizedBox( height: 2 );
+    static const kVerticalSpacingSmall = SizedBox( height: 8 );
+    static const kVerticalSpacingMedium = SizedBox( height: 12 );
+    static const kVerticalSpacingLarge = SizedBox( height: 16 );
+    static const kVerticalSpacingExtraLarge = SizedBox( height: 24 );
+    static const kHorizontalSpacingExtraSmall = SizedBox( width: 4 );
+    static const kHorizontalSpacingSmall = SizedBox( height: 8 );
+    static const kHorizontalSpacingMedium = SizedBox( height: 12 );
+    static const kHorizontalSpacingLarge = SizedBox( height: 16 );
+    static const kHorizontalSpacingExtraLarge = SizedBox( height: 24 );
+    static const kBodyTextStyle = TextStyle
+    (
+        fontSize: 10,
+        fontWeight: FontWeight.bold
+    );
 }
 class AssortmentUiMainScreen extends StatefulWidget // TODO: Beautify the UI/UX and improve the beauty of the app.
 {
@@ -91,7 +106,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
                                 {
                                     final product = _products[index];
 
-                                    return Text( product.title );
+                                    return _AssortmentUiProductCard( product );
                                 }, childCount: _products.length )
                             )
                         ),
@@ -119,5 +134,104 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
         {
             log( "$error" );
         }
+    }
+}
+class _AssortmentUiProductCard extends StatelessWidget 
+{
+    final AssortmentProduct product;
+
+    const _AssortmentUiProductCard( this.product );
+    
+    @override Widget build( BuildContext buildContext ) 
+    {
+        return Card
+        (
+            clipBehavior: Clip.antiAlias,
+            child: GestureDetector
+            (
+                onTap: () 
+                {
+                    log( "Tapped : ${product.title}" ); 
+                },
+                child: Column
+                (
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: 
+                    [
+                        Expanded
+                        (
+                            child: Image.network
+                            (
+                                product.thumbnail,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace)=> const Icon( Icons.image_not_supported_outlined ),
+                                loadingBuilder: (context, child, loadingProgress) 
+                                {
+                                    if( loadingProgress == null ) 
+                                    {
+                                        return child;
+                                    }
+
+                                    return const Center( child: CircularProgressIndicator() );
+                                }
+                            )
+                        ),
+                        Padding
+                        (
+                            padding: AssortmentUi.kCollapsedPadding,
+                            child: Text
+                            (
+                                product.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AssortmentUi.kBodyTextStyle
+                            )
+                        ),
+                        Row
+                        (
+                            children: 
+                            [
+                                Padding
+                                (
+                                    padding: AssortmentUi.kCollapsedPadding,
+                                    child: Text
+                                    (
+                                        'RM ${product.price.toStringAsFixed( 2 )}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AssortmentUi.kBodyTextStyle.copyWith( color: const Color.fromARGB(255, 44, 138, 49) )
+                                    )
+                                ),
+                                Padding
+                                (
+                                    padding: AssortmentUi.kCollapsedPadding,
+                                    child: Row
+                                    (
+                                        mainAxisSize: MainAxisSize.min,
+                                        children:
+                                        [
+                                            const Icon
+                                            (
+                                                Icons.star_rounded,
+                                                color: Colors.amber,
+                                                size: 20
+                                            ),
+                                            AssortmentUi.kHorizontalSpacingExtraSmall,
+                                            Text
+                                            (
+                                                product.rating.toStringAsFixed( 1 ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: AssortmentUi.kBodyTextStyle
+                                            )
+                                        ]
+                                    )
+                                )
+                            ]
+                        )
+                    ]
+                )
+            )
+        );
     }
 }

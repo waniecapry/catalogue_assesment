@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:developer";
 
 import "package:flutter/material.dart";
@@ -76,6 +77,7 @@ class _AssortmentUiProductListScreen extends StatefulWidget
 class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductListScreen> 
 {
     static const int _limit = 20; // Number of products to fetch per request. I make it as const first, but if the UI allow users to set the limit, I will make it as variable and set it from the UI.
+    static const Duration _searchDelay = Duration( milliseconds: 600 );
 
     final ScrollController _scrollController = ScrollController();
     final List<AssortmentProduct> _products = [];
@@ -84,6 +86,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     bool _isLoading = false;
     Object? _loadError;
     String _searchQuery = "";
+    Timer? _searchDebounce;
 
     bool get _isBottom 
     {
@@ -105,6 +108,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     }
     @override void dispose() 
     {
+        _searchDebounce?.cancel();
         _scrollController.dispose();
         super.dispose();
     }
@@ -134,21 +138,31 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
                                 leading: const Icon( Icons.search ),
                                 onChanged: (String value)
                                 {
-                                    setState( () 
-                                    {
-                                        _products.clear();
+                                    _searchDebounce?.cancel();
 
-                                        _searchQuery = value.trim();
-                                        _offset = 0;
-                                        _hasMoreProducts = true;
-                                        _isLoading = false;
-                                        _loadError = null;
-                                    });
+                                    _searchDebounce = Timer
+                                    (
+                                        _searchDelay,
+                                        ()
+                                        {
+                                            setState( () 
+                                            {
+                                                _products.clear();
 
-                                    _loadProducts();
+                                                _searchQuery = value.trim();
+                                                _offset = 0;
+                                                _hasMoreProducts = true;
+                                                _isLoading = false;
+                                                _loadError = null;
+                                            });
+
+                                            _loadProducts();
+                                        }
+                                    );
                                 },
                                 onSubmitted: (String value) // logics are repeated. Better to make a reusable method for this.
                                 {
+                                    _searchDebounce?.cancel(); // The user press submit button ma, so remove the debounce and immediately go search the products.
                                     setState( () 
                                     {
                                         _products.clear();

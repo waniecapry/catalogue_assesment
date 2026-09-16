@@ -20,15 +20,18 @@ class _AssortmentUiMainScreenState extends State<AssortmentUiMainScreen>
     {
         return Scaffold
         ( 
-            body: GestureDetector
+            body: SafeArea
             (
-                child: Text( "Welcome" ),
-                onTap: () async
-                {
-                    final products = await Assortment.getProductList( 0, 20 );
+                child: GestureDetector
+                (
+                    child: Text( "Welcome" ),
+                    onTap: () async
+                    {
+                        final products = await Assortment.getProductList( 0, 20 );
 
-                    log( "This is the loaded products: $products" );
-                }
+                        log( "This is the loaded products: $products" );
+                    }
+                )
             )
         );
     }

@@ -35,9 +35,9 @@ class Assortment // This class represents the app. Its like a namespace. Assortm
     static const String appDescription = "Experience the finest way to shop";
     static final Dio _dio = Dio();
 
-    static Future<List<Map<String, dynamic>>> getProductList( int offset, int limit ) async
+    static Future<List<AssortmentProduct>> getProductList( int offset, int limit ) async
     {
-        final List<Map<String, dynamic>> products = [];
+        final List<AssortmentProduct> products = [];
 
         Response r = await _dio.get
         (
@@ -53,9 +53,9 @@ class Assortment // This class represents the app. Its like a namespace. Assortm
 
         return products;
     }
-    static Future<List<Map<String, dynamic>>> searchProduct( String query, int offset, int limit ) async
+    static Future<AssortmentProduct> searchProduct( String query, int offset, int limit ) async
     {
-        final List<Map<String, dynamic>> products = [];
+        final List<AssortmentProduct> products = [];
 
         Response r = await _dio.get
         (

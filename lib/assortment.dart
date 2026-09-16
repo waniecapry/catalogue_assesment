@@ -29,7 +29,7 @@ enum AssortmentCategory
     const AssortmentCategory( this.value, this.str );
 }
 
-class Assortment // This class represents the app. Assortment stands for Product Catalogue. Anything constants, variables, methods that belong to the app should be placed here
+class Assortment // This class represents the app. Its like a namespace. Assortment stands for Product Catalogue. Anything constants, variables, methods that belong to the app should be placed here
 {
     static const String appName = "Assorta"; // constants with lowerCamelCase following Dart convention.
     static const String appDescription = "Experience the finest way to shop";
@@ -85,7 +85,7 @@ class AssortmentDimension
         required this.depth
     });
 }
-class AssortmentProduct // Many of the properties can be turned to enum/classes. It is easier to maintain, read and manage strongly typed data.
+class AssortmentProduct // in other OOP this class something like Assortment.Product
 {
     final String id;
     final String title;
@@ -103,8 +103,8 @@ class AssortmentProduct // Many of the properties can be turned to enum/classes.
     final String warrantyInfo;
     final String shippingInfo;
     final String availabilityStatus; // If possible, I will make an enum for this instead of String.
-    final List<Map<String, dynamic>> reviews = []; // review class
-    final Map<String, dynamic> meta; // class
+    final List<AssortmentProductReview> reviews = []; // review class
+    final AssortmentProductMeta meta; // class
     final List<String> images;
     final String thumbnail;
 
@@ -138,4 +138,36 @@ class AssortmentProduct // Many of the properties can be turned to enum/classes.
     {
         return this;
     }
+}
+class AssortmentProductReview // in other OOP this class something like Assortment.Product.Review
+{
+    final int rating;
+    final String comment;
+    final DateTime date;
+    final String reviewerName;
+    final String reviewerEmail;
+
+    AssortmentProductReview
+    ({
+        required this.rating,
+        required this.comment,
+        required this.date,
+        required this.reviewerName,
+        required this.reviewerEmail
+    });
+}
+class AssortmentProductMeta // in other OOP this class something like Assortment.Product.Meta
+{
+    final DateTime createdAt;
+    final DateTime updatedAt;
+    final String barcode;
+    final String qrUrl;
+
+    AssortmentProductMeta
+    ({
+        required this.createdAt,
+        required this.updatedAt,
+        required this.barcode,
+        required this.qrUrl
+    });
 }

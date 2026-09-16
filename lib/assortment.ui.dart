@@ -145,6 +145,13 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     }
     Future<void> _refreshProducts() async
     {
+        setState( ()
+        {
+            _products.clear();
+
+            _offset = 0;
+            _hasMoreProducts = true;
+        });
         await _loadProducts();
     }
     Future<void> _loadProducts() async 
@@ -156,6 +163,9 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
             setState( () 
             {
                 _products.addAll( products );
+
+                _offset += products.length;
+                _hasMoreProducts = products.length == _limit;
             });
         } 
         catch( error ) 

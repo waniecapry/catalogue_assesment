@@ -37,7 +37,6 @@ class Assortment // This class represents the app. Its like a namespace. Assortm
 
     static Future<List<AssortmentProduct>> getProductList( int offset, int limit ) async
     {
-        final List<AssortmentProduct> products = [];
 
         Response r = await _dio.get
         (
@@ -46,17 +45,17 @@ class Assortment // This class represents the app. Its like a namespace. Assortm
             options: Options( responseType: ResponseType.json )
         );                                                                          log( "Response data: ${r.data}" );
 
+        final List<AssortmentProduct> products = [];
+
         for( final product in r.data["products"] )
         {
-            products.add( Map<String, dynamic>.from( product ) );
+            products.add( AssortmentProduct.productFromJson( Map<String, dynamic>.from( product ) ) );
         }                                                                           log( "products: $products" );
 
         return products;
     }
-    static Future<AssortmentProduct> searchProduct( String query, int offset, int limit ) async
+    static Future<List<AssortmentProduct>> searchProduct( String query, int offset, int limit ) async
     {
-        final List<AssortmentProduct> products = [];
-
         Response r = await _dio.get
         (
             "https://dummyjson.com/products/search",
@@ -64,9 +63,11 @@ class Assortment // This class represents the app. Its like a namespace. Assortm
             options: Options( responseType: ResponseType.json ),
         );                                                                          log( "Response data: ${r.data}" );
 
+        final List<AssortmentProduct> products = [];
+
         for( final product in r.data["products"] )
         {
-            products.add( Map<String, dynamic>.from( product ) );
+            products.add( AssortmentProduct.productFromJson( Map<String, dynamic>.from( product ) ) );
         }                                                                           log( "products: $products" );
 
         return products;
@@ -86,15 +87,15 @@ class AssortmentDimension
     });
 }
 class AssortmentProduct // in other OOP this class something like Assortment.Product
-{
+{   // I make the properties all as final first since there's no requirement to fetch and update the loaded item details.
     final String id;
     final String title;
     final String description;
     final AssortmentCategory category; // enum
     final double price;
-    final double discountPercentage;
-    final double rating;
-    final int stock;
+    final double discountPercentage; // This property may not become final if its in real app since discount percentage can be changed
+    final double rating; // This property also may not become final in real app.
+    final int stock; // This property also may not become final in real app
     final List<String> tags;
     final String brand; // If given the list of brands, I will make Brand class and use it here instead of String.
     final String sku;
@@ -107,6 +108,46 @@ class AssortmentProduct // in other OOP this class something like Assortment.Pro
     final AssortmentProductMeta meta; // class
     final List<String> images;
     final String thumbnail;
+
+    static AssortmentProduct productFromJson( Map<String, dynamic> product ) 
+    {
+        final dimensions = Map<String, dynamic>.from( product["dimensions"] );
+        final meta = Map<String, dynamic>.from( product["meta"] );
+
+        return AssortmentProduct
+        (
+            id: product["id"].toString(),
+            title: product["title"],
+            description: product["description"],
+            category: AssortmentCategory.fromString(product["category"]),
+            price: (product["price"] as num).toDouble(),
+            discountPercentage: (product["discountPercentage"] as num).toDouble(),
+            rating: (product["rating"] as num).toDouble(),
+            stock: product["stock"],
+            tags: List<String>.from(product["tags"]),
+            brand: product["brand"] ?? "",
+            sku: product["sku"],
+            weight: (product["weight"] as num).toDouble(),
+            dimension: AssortmentDimension
+            (
+                width: (dimensions["width"] as num).toDouble(),
+                height: (dimensions["height"] as num).toDouble(),
+                depth: (dimensions["depth"] as num).toDouble(),
+            ),
+            warrantyInfo: product["warrantyInformation"],
+            shippingInfo: product["shippingInformation"],
+            availabilityStatus: product["availabilityStatus"],
+            meta: AssortmentProductMeta
+            (
+                createdAt: DateTime.parse( meta["createdAt"] ),
+                updatedAt: DateTime.parse( meta["updatedAt"] ),
+                barcode: meta["barcode"],
+                qrUrl: meta["qrCode"],
+            ),
+            images: List<String>.from( product["images"] ),
+            thumbnail: product["thumbnail"],
+        );
+    }
 
     AssortmentProduct
     ({
@@ -130,6 +171,42 @@ class AssortmentProduct // in other OOP this class something like Assortment.Pro
         required this.images,
         required this.thumbnail
     });
+    // AssortmentProduct.fromJson( Map<String, dynamic> product )  // I wanted to do this named constructor, but it will make the class property to be defined as late, which I don"t want. So I will just make a static method to do the same thing.
+    // {
+    //     final dimensions = Map<String, dynamic>.from( product["dimensions"] );
+    //     final meta = Map<String, dynamic>.from( product["meta"] );
+
+    //     id = product["id"].toString();
+    //     title = product["title"];
+    //     description = product["description"];
+    //     category = AssortmentCategory.fromString(product["category"]);
+    //     price = (product["price"] as num).toDouble();
+    //     discountPercentage = (product["discountPercentage"] as num).toDouble();
+    //     rating = (product["rating"] as num).toDouble();
+    //     stock = product["stock"];
+    //     tags = List<String>.from(product["tags"]);
+    //     brand = product["brand"] ?? "";
+    //     sku = product["sku"];
+    //     weight = (product["weight"] as num).toDouble();
+    //     dimension = AssortmentDimension
+    //     (
+    //         width = (dimensions["width"] as num).toDouble(),
+    //         height = (dimensions["height"] as num).toDouble(),
+    //         depth = (dimensions["depth"] as num).toDouble(),
+    //     );
+    //     warrantyInfo = product["warrantyInformation"];
+    //     shippingInfo = product["shippingInformation"];
+    //     availabilityStatus = product["availabilityStatus"];
+    //     meta = AssortmentProductMeta
+    //     (
+    //         createdAt = DateTime.parse(meta["createdAt"]),
+    //         updatedAt = DateTime.parse(meta["updatedAt"]),
+    //         barcode = meta["barcode"],
+    //         qrUrl = meta["qrCode"],
+    //     );
+    //     images = List<String>.from(product["images"]);
+    //     thumbnail = product["thumbnail"];
+    // }
     double get discountedPrice 
     {
         return price * (1 - discountPercentage / 100);

@@ -82,10 +82,28 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     int _offset = 0;
     bool _hasMoreProducts = true;
 
+    bool get _isBottom 
+    {
+        if( !_scrollController.hasClients ) 
+        {
+            return false;
+        }
+
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.offset;
+
+        return currentScroll >= (maxScroll * 0.9); // Trigger at 90% scroll
+    }
     @override void initState()
     {
         super.initState();
+        _scrollController.addListener( _onScroll );
         _loadProducts();
+    }
+    @override void dispose() 
+    {
+        _scrollController.dispose();
+        super.dispose();
     }
     @override Widget build( BuildContext context ) 
     {
@@ -143,6 +161,13 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
         catch( error ) 
         {
             log( "$error" );
+        }
+    }
+    void _onScroll() 
+    {
+        if( _isBottom && _hasMoreProducts ) 
+        {
+            _loadProducts();
         }
     }
 }

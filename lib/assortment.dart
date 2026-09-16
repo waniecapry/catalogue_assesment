@@ -85,6 +85,10 @@ class AssortmentDimension
         required this.height,
         required this.depth
     });
+    @override String toString() 
+    {
+        return "$width x $height x $depth";
+    }
 }
 class AssortmentProduct // in other OOP this class something like Assortment.Product
 {   // I make the properties all as final first since there's no requirement to fetch and update the loaded item details.

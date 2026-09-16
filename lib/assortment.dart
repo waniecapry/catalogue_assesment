@@ -2,6 +2,33 @@ import "dart:developer";
 
 import "package:dio/dio.dart"; // Using dio for handling the HTTP client.
 
+enum AssortmentCategory 
+{
+    beauty( "beauty", "Beauty" ),
+    fragrances( "fragrances", "Fragrances" ),
+    furniture( "furniture", "Furniture" ),
+    groceries( "groceries", "Groceries" ),
+    other( "other", "Other" );
+
+    final String value;
+    final String str;
+
+    static AssortmentCategory fromString( final String value ) 
+    {
+        for( AssortmentCategory cat in AssortmentCategory.values ) 
+        {
+            if( cat.value == value )
+            {
+                return cat;
+            }
+        }
+
+        return AssortmentCategory.other;
+    }
+
+    const AssortmentCategory( this.value, this.str );
+}
+
 class Assortment // This class represents the app. Assortment stands for Product Catalogue. Anything constants, variables, methods that belong to the app should be placed here
 {
     static const String appName = "Assorta"; // constants with lowerCamelCase following Dart convention.
@@ -50,7 +77,7 @@ class AssortmentProduct // Many of the properties can be turned to enum/classes.
     final String id;
     final String title;
     final String description;
-    final String category; // enum
+    final AssortmentCategory category; // enum
     final double price;
     final double discountPercentage;
     final double rating;

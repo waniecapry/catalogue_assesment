@@ -9,7 +9,7 @@ A new Flutter project.
 ## AI Usage
 
 1. In this application, I use AI in two things. One is to write commit message. In VS Code, there's a tool to let AI write the commit message. 
-2. I use AI to decide whether to use Silver or normal GridView with scroll. I decided to use Scroll as it is more dynamic and flexible.
+2. I use AI to decide whether to use Silver or normal GridView with scroll. I decided to use Silver as it is more dynamic and flexible.
 
 ## Stack & Architecture design
 

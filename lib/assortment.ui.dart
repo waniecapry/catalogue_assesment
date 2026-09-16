@@ -87,6 +87,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     Object? _loadError;
     String _searchQuery = "";
     Timer? _searchDebounce;
+    int _requestVersion = 0; // Used to track the "request" version. Users may search another thing while the app is waiting for the response from the server for the previous search
 
     bool get _isBottom 
     {
@@ -118,7 +119,20 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
         (
             body: RefreshIndicator // Used to reload the products.
             (
-                onRefresh: _refreshProducts,
+                onRefresh: () async
+                {
+                    setState( ()
+                    {
+                        ++_requestVersion;
+                        _products.clear();
+
+                        _offset = 0;
+                        _hasMoreProducts = true;
+                        _isLoading = false;
+                        _loadError = null;
+                    });
+                    await _loadProducts();
+                },
                 child: CustomScrollView
                 (
                     controller: _scrollController,
@@ -147,6 +161,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
                                         {
                                             setState( () 
                                             {
+                                                ++_requestVersion;
                                                 _products.clear();
 
                                                 _searchQuery = value.trim();
@@ -165,6 +180,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
                                     _searchDebounce?.cancel(); // The user press submit button ma, so remove the debounce and immediately go search the products.
                                     setState( () 
                                     {
+                                        ++_requestVersion;
                                         _products.clear();
 
                                         _searchQuery = value.trim();
@@ -243,25 +259,14 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
             )
         );
     }
-    Future<void> _refreshProducts() async
-    {
-        setState( ()
-        {
-            _products.clear();
-
-            _offset = 0;
-            _hasMoreProducts = true;
-            _isLoading = false;
-            _loadError = null;
-        });
-        await _loadProducts();
-    }
     Future<void> _loadProducts() async 
     {
         if( _isLoading || !_hasMoreProducts ) 
         {
             return;
         }
+
+        final requestVersion = _requestVersion;
 
         setState( () 
         {
@@ -273,7 +278,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
         {
             final products = _searchQuery.isEmpty ? await Assortment.getProductList( _offset, _limit ) : await Assortment.searchProduct( _searchQuery, _offset, _limit );
 
-            if( !mounted ) // Who knows user has back to the previous page?
+            if( !mounted || requestVersion != _requestVersion ) // Who knows user has back to the previous page?
             {
                 return;
             }
@@ -289,7 +294,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
         } 
         catch( error ) 
         {                                                                               log( "$error" );
-            if( !mounted ) // Who knows user has back to the previous page?
+            if( !mounted || requestVersion != _requestVersion ) // Who knows user has back to the previous page?
             {
                 return;
             }

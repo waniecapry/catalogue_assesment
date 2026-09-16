@@ -2,7 +2,7 @@ import "dart:developer";
 
 import "package:flutter/material.dart";
 
-import "assortment.dart";
+import "assortment.ui.dart";
 
 void main() 
 {
@@ -18,19 +18,7 @@ class App extends StatelessWidget
         return MaterialApp
         (
             title: "Assortment",
-            home: Scaffold
-            ( 
-                body: GestureDetector
-                (
-                    child: Text( "Welcome" ),
-                    onTap: () async
-                    {
-                        final products = await Assortment.getProductList( 0, 20 );
-
-                        log( "This is the loaded products: $products" );
-                    }
-                )
-            )
+            home: const AssortmentUiMainScreen()
         );
     }
 }

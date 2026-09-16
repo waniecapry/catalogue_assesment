@@ -83,6 +83,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
     bool _hasMoreProducts = true;
     bool _isLoading = false;
     Object? _loadError;
+    String _searchQuery = "";
 
     bool get _isBottom 
     {
@@ -120,6 +121,51 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: 
                     [
+                        SliverAppBar
+                        (
+                            title: SearchBar
+                            (
+                                constraints: const BoxConstraints
+                                (
+                                    minHeight: 40,
+                                    maxHeight: 40
+                                ),
+                                hintText: "Search products",
+                                leading: const Icon( Icons.search ),
+                                onChanged: (String value)
+                                {
+                                    setState( () 
+                                    {
+                                        _products.clear();
+
+                                        _searchQuery = value.trim();
+                                        _offset = 0;
+                                        _hasMoreProducts = true;
+                                        _isLoading = false;
+                                        _loadError = null;
+                                    });
+
+                                    _loadProducts();
+                                },
+                                onSubmitted: (String value) // logics are repeated. Better to make a reusable method for this.
+                                {
+                                    setState( () 
+                                    {
+                                        _products.clear();
+
+                                        _searchQuery = value.trim();
+                                        _offset = 0;
+                                        _hasMoreProducts = true;
+                                        _isLoading = false;
+                                        _loadError = null;
+                                    });
+                        
+                                    _loadProducts();
+                                }
+                            ),
+                            floating: true,
+                            snap: true
+                        ),
                         SliverPadding
                         (
                             padding: AssortmentUi.kPadding,
@@ -211,7 +257,7 @@ class _AssortmentUiProductListScreenState extends State<_AssortmentUiProductList
 
         try 
         {
-            final products = await Assortment.getProductList( _offset, _limit );
+            final products = _searchQuery.isEmpty ? await Assortment.getProductList( _offset, _limit ) : await Assortment.searchProduct( _searchQuery, _offset, _limit );
 
             if( !mounted ) // Who knows user has back to the previous page?
             {
